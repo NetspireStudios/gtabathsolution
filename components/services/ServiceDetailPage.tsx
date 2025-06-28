@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, useInView } from 'framer-motion'
@@ -19,7 +19,8 @@ import {
   Package,
   Shield,
   Bath,
-  Heart
+  Heart,
+  Loader2
 } from 'lucide-react'
 
 const iconMap = {
@@ -82,14 +83,27 @@ export default function ServiceDetailPage({
   relatedServices
 }: ServiceDetailPageProps) {
   const Icon = iconMap[iconName as keyof typeof iconMap] || Shield
-  const [openFaq, setOpenFaq] = React.useState<number | null>(null)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
   const sectionRef = useRef(null)
-  const isInView = useInView(sectionRef, { once: true, amount: 0.2 })
+  const isInView = useInView(sectionRef, { once: true, amount: 0.1 })
+
+  // Simplified animations for better performance
+  const simpleAnimation = {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.4 }
+  }
+
+  const handleQuoteClick = () => {
+    setIsLoading(true)
+    setTimeout(() => setIsLoading(false), 1000)
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative h-[50vh] sm:h-[60vh] min-h-[400px] sm:min-h-[500px] flex items-center justify-center overflow-hidden">
+      {/* Hero Section - Fixed mobile spacing */}
+      <section className="relative h-[60vh] sm:h-[65vh] md:h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden pt-16 md:pt-0">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
@@ -107,11 +121,11 @@ export default function ServiceDetailPage({
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.5 }}
             className="max-w-4xl text-center lg:text-left"
           >
             {/* Breadcrumb */}
-            <nav className="flex items-center justify-center lg:justify-start space-x-2 text-sm mb-4 md:mb-6">
+            <nav className="flex items-center justify-center lg:justify-start space-x-2 text-sm mb-6 md:mb-8">
               <Link href="/" className="hover:text-primary transition-colors">
                 <Home className="w-4 h-4" />
               </Link>
@@ -123,34 +137,46 @@ export default function ServiceDetailPage({
               <span className="text-primary">{title}</span>
             </nav>
 
-            <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-4 lg:space-y-0 lg:space-x-4 mb-6 md:mb-8">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
-                <Icon className="w-6 h-6 md:w-8 md:h-8 text-white" />
+            <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-6 mb-8 md:mb-10">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
               </div>
               <div className="text-center lg:text-left">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">{title}</h1>
-                <p className="text-lg md:text-xl text-gray-300 mt-2">{subtitle}</p>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-3">
+                  {title}
+                </h1>
+                <p className="text-lg md:text-xl text-gray-300">{subtitle}</p>
               </div>
             </div>
 
-            <p className="text-base md:text-lg text-gray-200 leading-relaxed mb-6 md:mb-8 px-4 lg:px-0">
+            <p className="text-base md:text-lg text-gray-200 leading-relaxed mb-8 md:mb-10 px-2 lg:px-0 max-w-3xl mx-auto lg:mx-0">
               {description}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 items-center justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start">
               <Link
                 href="/quote"
-                className="inline-flex items-center justify-center w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 group touch-manipulation"
+                onClick={handleQuoteClick}
+                className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl touch-manipulation"
               >
-                Get Free Quote
-                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    Get Free Quote
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
               </Link>
               
               <a
                 href="tel:+14374227010"
-                className="inline-flex items-center justify-center w-full sm:w-auto px-6 md:px-8 py-3 md:py-4 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg hover:bg-white/20 transition-all duration-300 font-semibold touch-manipulation"
+                className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg hover:bg-white/20 transition-all duration-200 font-semibold text-lg touch-manipulation"
               >
-                <Phone className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                <Phone className="w-5 h-5 mr-2" />
                 <span className="hidden sm:inline">Call (437) 422-7010</span>
                 <span className="sm:hidden">Call Now</span>
               </a>
@@ -159,165 +185,177 @@ export default function ServiceDetailPage({
         </div>
       </section>
 
-      {/* Main Content */}
-      <section ref={sectionRef} className="py-16 md:py-20">
+      {/* Main Content - Better mobile spacing */}
+      <section ref={sectionRef} className="py-12 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Left Content */}
-            <div className="lg:col-span-2 space-y-8 md:space-y-12">
+            <div className="lg:col-span-2 space-y-10 md:space-y-16">
               {/* Main Content Sections */}
               {mainContent.map((section, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, delay: index * 0.1 }}
-                  className="space-y-4"
+                  {...simpleAnimation}
+                  className="space-y-4 md:space-y-6"
                 >
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{section.title}</h2>
-                  <div className="text-gray-600 leading-relaxed whitespace-pre-line text-sm md:text-base">
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                    {section.title}
+                  </h2>
+                  <div className="text-gray-600 leading-relaxed whitespace-pre-line text-base md:text-lg">
                     {section.content}
                   </div>
                 </motion.div>
               ))}
 
-              {/* Process Section */}
+              {/* Process Section - Improved mobile visibility */}
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="space-y-6"
+                {...simpleAnimation}
+                className="bg-gray-50 rounded-2xl p-6 md:p-8 space-y-6 md:space-y-8"
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Our Process</h2>
-                <div className="space-y-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center md:text-left">
+                  Our Process
+                </h2>
+                <div className="space-y-6 md:space-y-8">
                   {process.map((step, index) => (
-                    <motion.div
+                    <div
                       key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={isInView ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                      className="flex items-start space-x-3 md:space-x-4"
+                      className="flex items-start space-x-4 md:space-x-6 p-4 md:p-6 bg-white rounded-xl shadow-sm"
                     >
-                      <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm md:text-base">
+                      <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg">
                         {step.step}
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-1 text-sm md:text-base">{step.title}</h3>
-                        <p className="text-gray-600 text-sm md:text-base">{step.description}</p>
+                      <div className="flex-1 pt-1">
+                        <h3 className="font-bold text-gray-900 mb-2 text-lg md:text-xl">
+                          {step.title}
+                        </h3>
+                        <p className="text-gray-600 text-base md:text-lg leading-relaxed">
+                          {step.description}
+                        </p>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </motion.div>
 
-              {/* FAQs */}
+              {/* FAQs - Simplified for mobile */}
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className="space-y-6"
+                {...simpleAnimation}
+                className="space-y-6 md:space-y-8"
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
-                <div className="space-y-3 md:space-y-4">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center md:text-left">
+                  Frequently Asked Questions
+                </h2>
+                <div className="space-y-4">
                   {faqs.map((faq, index) => (
-                    <motion.div
+                    <div
                       key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={isInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                      className="bg-gray-50 rounded-xl overflow-hidden"
+                      className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm"
                     >
                       <button
                         onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                        className="w-full px-4 md:px-6 py-3 md:py-4 text-left flex items-center justify-between hover:bg-gray-100 transition-colors touch-manipulation"
+                        className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors touch-manipulation"
                       >
-                        <span className="font-semibold text-gray-900 text-sm md:text-base pr-4">{faq.question}</span>
+                        <span className="font-semibold text-gray-900 text-base md:text-lg pr-4 leading-tight">
+                          {faq.question}
+                        </span>
                         <ChevronDown 
-                          className={`w-4 h-4 md:w-5 md:h-5 text-gray-500 transition-transform flex-shrink-0 ${
+                          className={`w-5 h-5 text-gray-500 transition-transform flex-shrink-0 ${
                             openFaq === index ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
                       {openFaq === index && (
-                        <div className="px-4 md:px-6 pb-3 md:pb-4">
-                          <p className="text-gray-600 text-sm md:text-base">{faq.answer}</p>
+                        <div className="px-6 pb-5 border-t border-gray-100">
+                          <p className="text-gray-600 text-base md:text-lg leading-relaxed pt-4">
+                            {faq.answer}
+                          </p>
                         </div>
                       )}
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </motion.div>
             </div>
 
-            {/* Right Sidebar */}
-            <div className="space-y-6 md:space-y-8">
+            {/* Right Sidebar - Mobile improvements */}
+            <div className="space-y-6 md:space-y-8 mt-8 lg:mt-0">
               {/* Features Card */}
               <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="bg-white rounded-2xl shadow-xl p-6 md:p-8 lg:sticky lg:top-24"
+                {...simpleAnimation}
+                className="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100 lg:sticky lg:top-28"
               >
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Key Features</h3>
-                <ul className="space-y-2 md:space-y-3">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 text-center lg:text-left">
+                  Key Features
+                </h3>
+                <ul className="space-y-4">
                   {features.map((feature, index) => (
-                    <li key={index} className="flex items-start space-x-2 md:space-x-3">
-                      <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700 text-sm md:text-base">{feature}</span>
+                    <li key={index} className="flex items-start space-x-3">
+                      <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                      <span className="text-gray-700 text-base leading-relaxed">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
                 {/* Pricing Info */}
-                <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-200">
-                  <div className="flex items-center justify-between mb-3 md:mb-4">
+                <div className="mt-8 pt-8 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
-                      <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                      <span className="font-semibold text-gray-900 text-sm md:text-base">Pricing</span>
+                      <DollarSign className="w-5 h-5 text-primary" />
+                      <span className="font-semibold text-gray-900 text-lg">Pricing</span>
                     </div>
-                    <span className="text-lg md:text-xl font-bold text-primary">{pricing.starting}</span>
+                    <span className="text-2xl font-bold text-primary">{pricing.starting}</span>
                   </div>
-                  <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3">Pricing depends on:</p>
-                  <ul className="space-y-1 text-xs md:text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 mb-3">Pricing depends on:</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
                     {pricing.factors.map((factor, index) => (
                       <li key={index} className="flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-gray-400 rounded-full flex-shrink-0" />
+                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full flex-shrink-0" />
                         <span>{factor}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* CTA Button */}
-                <div className="mt-6 md:mt-8">
+                {/* CTA Button with loading */}
+                <div className="mt-8">
                   <Link
                     href="/quote"
-                    className="inline-flex items-center justify-center w-full px-6 py-3 md:py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 group touch-manipulation"
+                    onClick={handleQuoteClick}
+                    className="inline-flex items-center justify-center w-full px-6 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl touch-manipulation"
                   >
-                    Get Your Free Quote
-                    <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        Get Your Free Quote
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </>
+                    )}
                   </Link>
                 </div>
 
                 {/* Trust Badge */}
-                <div className="mt-4 md:mt-6 text-center">
+                <div className="mt-6 text-center">
                   <div className="flex items-center justify-center space-x-2 text-primary">
                     <Award className="w-4 h-4" />
-                    <span className="text-xs md:text-sm font-medium">3 Year Warranty Included</span>
+                    <span className="text-sm font-medium">3 Year Warranty Included</span>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Related Services */}
+              {/* Related Services - Mobile optimized */}
               {relatedServices.length > 0 && (
                 <motion.div
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.8, delay: 0.4 }}
+                  {...simpleAnimation}
                   className="bg-gray-50 rounded-2xl p-6 md:p-8"
                 >
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Related Services</h3>
-                  <div className="space-y-2 md:space-y-3">
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 text-center lg:text-left">
+                    Related Services
+                  </h3>
+                  <div className="space-y-3">
                     {relatedServices.map((serviceId, index) => {
                       const service = relatedServicesMap[serviceId]
                       if (!service) return null
@@ -326,9 +364,9 @@ export default function ServiceDetailPage({
                         <Link
                           key={serviceId}
                           href={service.href}
-                          className="block p-3 md:p-4 bg-white rounded-lg hover:bg-primary/5 transition-colors group touch-manipulation"
+                          className="block p-4 bg-white rounded-lg hover:bg-primary/5 transition-colors group touch-manipulation border border-gray-100"
                         >
-                          <span className="text-gray-700 group-hover:text-primary transition-colors text-sm md:text-base">
+                          <span className="text-gray-700 group-hover:text-primary transition-colors font-medium">
                             {service.name}
                           </span>
                         </Link>
