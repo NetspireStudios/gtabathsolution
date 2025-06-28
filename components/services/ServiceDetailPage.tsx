@@ -102,8 +102,8 @@ export default function ServiceDetailPage({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section - Fixed mobile spacing */}
-      <section className="relative h-[60vh] sm:h-[65vh] md:h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden pt-16 md:pt-0">
+      {/* Hero Section - Fixed mobile layout and button visibility */}
+      <section className="relative min-h-[70vh] md:h-[70vh] flex items-center justify-center overflow-hidden pt-20 md:pt-0">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
@@ -113,19 +113,19 @@ export default function ServiceDetailPage({
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-4xl text-center lg:text-left"
+            className="max-w-4xl text-center lg:text-left mx-auto lg:mx-0 py-8 md:py-12"
           >
-            {/* Breadcrumb */}
-            <nav className="flex items-center justify-center lg:justify-start space-x-2 text-sm mb-6 md:mb-8">
+            {/* Breadcrumb - Hidden on mobile, visible on desktop */}
+            <nav className="hidden md:flex items-center justify-center lg:justify-start space-x-2 text-sm mb-6 md:mb-8">
               <Link href="/" className="hover:text-primary transition-colors">
                 <Home className="w-4 h-4" />
               </Link>
@@ -153,11 +153,12 @@ export default function ServiceDetailPage({
               {description}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start">
+            {/* Fixed button layout for mobile visibility */}
+            <div className="space-y-4 sm:space-y-0 sm:flex sm:flex-row sm:gap-4 items-center justify-center lg:justify-start max-w-md mx-auto lg:max-w-none">
               <Link
                 href="/quote"
                 onClick={handleQuoteClick}
-                className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl touch-manipulation"
+                className="flex items-center justify-center w-full sm:flex-1 sm:max-w-xs px-6 py-4 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 font-semibold text-base shadow-lg hover:shadow-xl touch-manipulation"
               >
                 {isLoading ? (
                   <>
@@ -174,7 +175,7 @@ export default function ServiceDetailPage({
               
               <a
                 href="tel:+14374227010"
-                className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg hover:bg-white/20 transition-all duration-200 font-semibold text-lg touch-manipulation"
+                className="flex items-center justify-center w-full sm:flex-1 sm:max-w-xs px-6 py-4 bg-white/10 backdrop-blur-sm text-white border border-white/20 rounded-lg hover:bg-white/20 transition-all duration-200 font-semibold text-base touch-manipulation"
               >
                 <Phone className="w-5 h-5 mr-2" />
                 <span className="hidden sm:inline">Call (437) 422-7010</span>
@@ -316,7 +317,7 @@ export default function ServiceDetailPage({
                   </ul>
                 </div>
 
-                {/* CTA Button with loading */}
+                {/* CTA Button with loading - Mobile optimized */}
                 <div className="mt-8">
                   <Link
                     href="/quote"
@@ -335,6 +336,17 @@ export default function ServiceDetailPage({
                       </>
                     )}
                   </Link>
+                </div>
+
+                {/* Mobile Call Button - Full width for mobile */}
+                <div className="mt-4 block lg:hidden">
+                  <a
+                    href="tel:+14374227010"
+                    className="inline-flex items-center justify-center w-full px-6 py-4 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-all duration-200 font-semibold text-lg shadow-sm touch-manipulation"
+                  >
+                    <Phone className="w-5 h-5 mr-2" />
+                    Call (437) 422-7010
+                  </a>
                 </div>
 
                 {/* Trust Badge */}
